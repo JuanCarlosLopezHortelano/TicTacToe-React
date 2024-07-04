@@ -1,39 +1,8 @@
 import { Children } from "react"
 import { useState } from "react"
-
-const TURNS = {
-
-  X: 'x',
-  O: 'o'
-
-}
-
-const Square = ({children,isSelected, updateBoard, index}) => 
-
-  {
-  const className = `square ${isSelected ? 'is-selected' : ''}`
-
-  const handleClick = () => {
-    updateBoard(index)
-  }
-
-  return(
-    <div onClick = {handleClick} className={className}>
-      {children}
-    </div>
-  )
-}
-
-const WINNER_COMBOS = [
-  [0, 1, 2], // Fila superior
-  [3, 4, 5], // Fila del medio
-  [6, 7, 8], // Fila inferior
-  [0, 3, 6], // Columna izquierda
-  [1, 4, 7], // Columna central
-  [2, 5, 8], // Columna derecha
-  [0, 4, 8], // Diagonal principal
-  [2, 4, 6]  // Diagonal secundaria
-]
+import confetti from "canvas-confetti"
+import {Square} from "./components/Square.jsx"
+import {TURNS, WINNER_COMBOS} from "./constants.js"
 
 
 
@@ -58,6 +27,16 @@ function App() {
 
   }
 
+  const resetGame = () =>{
+    setBoard(Array(9).fill(null))
+    setTurn(TURNS.X)
+    setWinner(null)
+  }
+
+  const checkEndGame = (newBoard) => {
+   return newBoard.every((square) => square !== null)
+  }
+
   const updateBoard = (index) =>{
 
 
@@ -70,13 +49,18 @@ function App() {
     setTurn(newTurn)
     const newWinner = checkWinner(newBoard)
     if (newWinner){
+      confetti()
       setWinner(newWinner)
+    }
+    else if (checkEndGame(newBoard) ){
+      setWinner(false)
     }
   }
 
   return(
     <main className="board">
       <h1>Tic Tac Toe</h1>
+      <button onClick={resetGame}>Reset del juego</button>
         <section className="game">
           {
             board.map((_,index)=> {
@@ -120,7 +104,7 @@ function App() {
                     {winner && <Square>{winner}</Square>}
                   </header>
                   <footer>
-                    <button>Empezar de nuevo</button>
+                    <button onClick={resetGame}>Empezar de nuevo</button>
                   </footer>
                 </div>
                </section>

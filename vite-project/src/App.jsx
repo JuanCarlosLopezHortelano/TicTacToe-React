@@ -1,11 +1,12 @@
 import { Children } from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import confetti from "canvas-confetti"
 import {Square} from "./components/Square.jsx"
 import {TURNS, WINNER_COMBOS} from "./constants.js"
 import { checkWinnerFrom, checkEndGame } from "./logic/board.js"
 import { WinnerModal } from "./components/WinnerModal.jsx"
-
+import { saveGameToStorage, resetGameStorage } from "./logic/storage/index.js"
+saveGameToStorage
 
 function App() {
   
@@ -28,9 +29,9 @@ function App() {
     setBoard(Array(9).fill(null))
     setTurn(TURNS.X)
     setWinner(null)
+    resetGameStorage()
 
-    window.localStorage.removeItem('board')
-    window.localStorage.removeItem('turn')
+    
   }
 
  
@@ -47,9 +48,7 @@ function App() {
     setTurn(newTurn)
 
     //guardar aqui partifa
-    window.localStorage.setItem('board',JSON.stringify(newBoard))
-    window.localStorage.setItem('turn',turn)
-
+    saveGameToStorage({board: newBoard, turn:newTurn})
     const newWinner = checkWinnerFrom(newBoard)
     if (newWinner){
       confetti()
@@ -60,6 +59,8 @@ function App() {
     }
   }
 
+
+  
   return(
     <main className="board">
       <h1>Tic Tac Toe</h1>
